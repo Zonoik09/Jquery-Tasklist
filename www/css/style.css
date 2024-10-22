@@ -24,16 +24,6 @@ div#tasks-contain {
     margin: 20px 0; 
 }
 
-div#tasks-contain ul { 
-    margin: 1em 0; 
-    padding: 0; 
-}
-
-div#tasks-contain ul li { 
-    padding: .6em 10px; 
-    margin-bottom: 5px; 
-}
-
 .ui-dialog .ui-state-error { 
     padding: .3em; 
 }
@@ -41,4 +31,37 @@ div#tasks-contain ul li {
 .validateTips { 
     border: 1px solid transparent; 
     padding: 0.3em; 
+}
+
+.task {
+    width: 270%;
+    border: 1px solid black;
+    margin-top: 0;
+    margin-bottom: 0;
+    padding: 2px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.task p {
+    margin: 0; 
+}
+
+.task button {
+    height: 30px;
+    margin-left: 10px;
+}
+
+.button-container {
+    display: flex;
+    margin-left: auto;
+}
+
+.button-container button {
+    margin-left: 2px;
+    background-color: white;
+    border: 1px solid black;
+    font-size: 800;
+    border-radius: 5px;
 }

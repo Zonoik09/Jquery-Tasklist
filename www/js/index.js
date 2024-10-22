@@ -2,7 +2,8 @@ $(function() {
     var dialog, form,
         name = $("#name"),
         allFields = name,
-        tips = $(".validateTips");
+        tips = $(".validateTips"),
+        currentTaskDiv;
 
     function updateTips(t) {
         tips.text(t).addClass("ui-state-highlight");
@@ -24,13 +25,40 @@ $(function() {
     function addTask() {
         var valid = true;
         allFields.removeClass("ui-state-error");
-
-        valid = valid && checkLength(name, "task name", 3, 16);
-
+        valid = valid && checkLength(name, "task name", 3, 100);
+        
         if (valid) {
-            $("#tasks ul").append($("<li>").text(name.val()));
+            if (currentTaskDiv) {
+                currentTaskDiv.find("p").text(name.val());
+            } else {
+                var taskDiv = $("<div class='task'>").append($("<p>").text(name.val()));
+                var buttonDiv = $("<div class='button-container'>");
+                
+                var editButton = $("<button>").text("EDIT").on("click", function() {
+                    name.val(taskDiv.find("p").text());
+                    currentTaskDiv = taskDiv;
+                    dialog.dialog("option", "buttons", {
+                        "Edit": addTask,
+                        Cancel: function() {
+                            dialog.dialog("close");
+                            currentTaskDiv = null;
+                        }
+                    });
+                    dialog.dialog("open");
+                });
+                
+                var deleteButton = $("<button>").text("X").on("click", function() {
+                    taskDiv.remove();
+                });
+                
+                buttonDiv.append(editButton).append(deleteButton);
+                taskDiv.append(buttonDiv);
+                $("#tasks").append(taskDiv);
+            }
+            
             dialog.dialog("close");
-        }
+            currentTaskDiv = null;
+        }        
         return valid;
     }
 
@@ -43,6 +71,7 @@ $(function() {
             "Create Task": addTask,
             Cancel: function() {
                 dialog.dialog("close");
+                currentTaskDiv = null;
             }
         },
         close: function() {
@@ -57,6 +86,14 @@ $(function() {
     });
 
     $("#create-task").button().on("click", function() {
+        dialog.dialog("option", "buttons", {
+            "Create Task": addTask,
+            Cancel: function() {
+                dialog.dialog("close");
+                currentTaskDiv = null;
+            }
+        });
         dialog.dialog("open");
+        currentTaskDiv = null;
     });
 });
