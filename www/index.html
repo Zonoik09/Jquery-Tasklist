@@ -1,16 +1,20 @@
 <!DOCTYPE html>
 <html lang="es">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>TaskList</title>
-        <link rel="stylesheet" href="https://code.jquery.com/ui/1.14.0/themes/base/jquery-ui.css">
-        <link rel="stylesheet" href="/css/style.css">
-        <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
-        <script src="https://code.jquery.com/ui/1.14.0/jquery-ui.js"></script>
-        <script src="js/index.js"></script>
-    </head>
-    <body>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>TaskList</title>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.14.0/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+    <script src="https://code.jquery.com/ui/1.14.0/jquery-ui.js"></script>
+    <script src="js/index.js"></script>
+</head>
+<body>
+    <h3>TaskList:</h3>
+    <div id="accordion"></div> <!-- El accordion para las tareas -->
+    <button id="create-task">New Task</button>
+
     <div id="dialog-form" title="Create new task">
         <form>
             <fieldset>
@@ -20,14 +24,5 @@
             </fieldset>
         </form>
     </div>
-
-    <div id="tasks-contain" class="ui-widget">
-        <h1>TaskList:</h1>
-        <div id="tasks">
-
-        </div>
-    </div>
-    <button id="create-task">New Task</button>
-
-    </body>
+</body>
 </html>

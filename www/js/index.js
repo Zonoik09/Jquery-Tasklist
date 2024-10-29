@@ -2,8 +2,7 @@ $(function() {
     var dialog, form,
         name = $("#name"),
         allFields = name,
-        tips = $(".validateTips"),
-        currentTaskDiv;
+        tips = $(".validateTips");
 
     function updateTips(t) {
         tips.text(t).addClass("ui-state-highlight");
@@ -28,38 +27,48 @@ $(function() {
         valid = valid && checkLength(name, "task name", 3, 100);
         
         if (valid) {
-            if (currentTaskDiv) {
-                currentTaskDiv.find("p").text(name.val());
-            } else {
-                var taskDiv = $("<div class='task'>").append($("<p>").text(name.val()));
-                var buttonDiv = $("<div class='button-container'>");
-                
-                var editButton = $("<button>").text("EDIT").on("click", function() {
-                    name.val(taskDiv.find("p").text());
-                    currentTaskDiv = taskDiv;
-                    dialog.dialog("option", "buttons", {
-                        "Edit": addTask,
-                        Cancel: function() {
-                            dialog.dialog("close");
-                            currentTaskDiv = null;
-                        }
-                    });
-                    dialog.dialog("open");
-                });
-                
-                var deleteButton = $("<button>").text("X").on("click", function() {
-                    taskDiv.remove();
-                });
-                
-                buttonDiv.append(editButton).append(deleteButton);
-                taskDiv.append(buttonDiv);
-                $("#tasks").append(taskDiv);
-            }
-            
+            var taskTitle = name.val();
+            var taskPanel = $("<h3>").text(taskTitle);
+            var taskContent = $("<div>").append($("<div class='button-container' style='display:none;'>"));
+
+            var editButton = $("<button>").text("EDIT").on("click", function() {
+                editTask(taskTitle);
+            });
+            var deleteButton = $("<button>").text("X").on("click", function() {
+                taskPanel.remove();
+                taskContent.remove();
+                refreshAccordion();
+            });
+
+            taskContent.find('.button-container').append(editButton).append(deleteButton);
+            $("#accordion").append(taskPanel).append(taskContent);
+            refreshAccordion();
+
             dialog.dialog("close");
-            currentTaskDiv = null;
         }        
         return valid;
+    }
+
+    function editTask(oldTitle) {
+        name.val(oldTitle);
+        dialog.dialog("option", "buttons", {
+            "Edit": function() {
+                var newTitle = name.val();
+                $("#accordion h3").filter(function() {
+                    return $(this).text() === oldTitle;
+                }).text(newTitle);
+                refreshAccordion();
+                dialog.dialog("close");
+            },
+            Cancel: function() {
+                dialog.dialog("close");
+            }
+        });
+        dialog.dialog("open");
+    }
+
+    function refreshAccordion() {
+        $("#accordion").accordion("refresh");
     }
 
     dialog = $("#dialog-form").dialog({
@@ -71,7 +80,6 @@ $(function() {
             "Create Task": addTask,
             Cancel: function() {
                 dialog.dialog("close");
-                currentTaskDiv = null;
             }
         },
         close: function() {
@@ -90,10 +98,24 @@ $(function() {
             "Create Task": addTask,
             Cancel: function() {
                 dialog.dialog("close");
-                currentTaskDiv = null;
             }
         });
         dialog.dialog("open");
-        currentTaskDiv = null;
+    });
+
+    // Inicializa el accordion
+    $("#accordion").accordion({
+        collapsible: true,
+        heightStyle: "content",
+        activate: function(event, ui) {
+            if (ui.newHeader.length) {
+                // Mostrar los botones al hacer clic en el panel
+                ui.newPanel.find('.button-container').show();
+            }
+            if (ui.oldHeader.length) {
+                // Ocultar los botones al cerrar el panel
+                ui.oldPanel.find('.button-container').hide();
+            }
+        }
     });
 });
