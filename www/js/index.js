@@ -25,7 +25,7 @@ $(function() {
         var valid = true;
         allFields.removeClass("ui-state-error");
         valid = valid && checkLength(name, "task name", 3, 100);
-        
+
         if (valid) {
             var taskTitle = name.val();
             var taskPanel = $("<h3>").text(taskTitle);
@@ -35,17 +35,18 @@ $(function() {
                 editTask(taskTitle);
             });
             var deleteButton = $("<button>").text("X").on("click", function() {
-                taskPanel.remove();
-                taskContent.remove();
-                refreshAccordion();
+                removeTask(taskTitle);
             });
 
             taskContent.find('.button-container').append(editButton).append(deleteButton);
             $("#accordion").append(taskPanel).append(taskContent);
             refreshAccordion();
 
+            // Guardar la nueva tarea en localStorage
+            saveTaskToLocalStorage(taskTitle);
+
             dialog.dialog("close");
-        }        
+        }
         return valid;
     }
 
@@ -54,9 +55,14 @@ $(function() {
         dialog.dialog("option", "buttons", {
             "Edit": function() {
                 var newTitle = name.val();
+
+                // Actualizar en el DOM
                 $("#accordion h3").filter(function() {
                     return $(this).text() === oldTitle;
                 }).text(newTitle);
+                
+                // Actualizar en localStorage
+                updateTaskInLocalStorage(oldTitle, newTitle);
                 refreshAccordion();
                 dialog.dialog("close");
             },
@@ -65,6 +71,59 @@ $(function() {
             }
         });
         dialog.dialog("open");
+    }
+
+    function removeTask(taskTitle) {
+        // Eliminar del DOM
+        $("#accordion h3").filter(function() {
+            return $(this).text() === taskTitle;
+        }).remove();
+        $("#accordion div:has(h3:contains('" + taskTitle + "'))").remove();
+
+        // Eliminar de localStorage
+        deleteTaskFromLocalStorage(taskTitle);
+
+        refreshAccordion();
+    }
+
+    function saveTaskToLocalStorage(taskTitle) {
+        let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+        tasks.push(taskTitle);
+        localStorage.setItem("tasks", JSON.stringify(tasks));
+    }
+
+    function updateTaskInLocalStorage(oldTitle, newTitle) {
+        let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+        const index = tasks.indexOf(oldTitle);
+        if (index !== -1) {
+            tasks[index] = newTitle;
+            localStorage.setItem("tasks", JSON.stringify(tasks));
+        }
+    }
+
+    function deleteTaskFromLocalStorage(taskTitle) {
+        let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+        tasks = tasks.filter(task => task !== taskTitle);
+        localStorage.setItem("tasks", JSON.stringify(tasks));
+    }
+
+    function loadTasksFromLocalStorage() {
+        let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+        tasks.forEach(function(taskTitle) {
+            var taskPanel = $("<h3>").text(taskTitle);
+            var taskContent = $("<div>").append($("<div class='button-container' style='display:none;'>"));
+
+            var editButton = $("<button>").text("EDIT").on("click", function() {
+                editTask(taskTitle);
+            });
+            var deleteButton = $("<button>").text("X").on("click", function() {
+                removeTask(taskTitle);
+            });
+
+            taskContent.find('.button-container').append(editButton).append(deleteButton);
+            $("#accordion").append(taskPanel).append(taskContent);
+        });
+        refreshAccordion();
     }
 
     function refreshAccordion() {
@@ -118,4 +177,7 @@ $(function() {
             }
         }
     });
+
+    // Cargar las tareas desde localStorage al cargar la página
+    loadTasksFromLocalStorage();
 });
